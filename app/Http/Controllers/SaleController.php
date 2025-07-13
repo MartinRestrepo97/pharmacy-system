@@ -12,7 +12,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Sale::all();
+        $sales = Sale::with(['customer', 'user', 'saleItems'])->paginate(10);
         return view('sales.index', compact('sales'));
     }
 
@@ -29,7 +29,16 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        Sale::create($request->all());
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:users,id',
+            'sale_date' => 'required|date',
+            'total_amount_decimal_12_2' => 'required|numeric|min:0|max:999999999999.99',
+            'payment_method_varchar_255' => 'required|string|max:255',
+            'notes_text' => 'nullable|string',
+        ]);
+
+        Sale::create($validated);
         return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
     }
 
@@ -54,7 +63,16 @@ class SaleController extends Controller
      */
     public function update(Request $request, Sale $sale)
     {
-        $sale->update($request->all());
+        $validated = $request->validate([
+            'customer_id' => 'sometimes|required|exists:customers,id',
+            'user_id' => 'sometimes|required|exists:users,id',
+            'sale_date' => 'sometimes|required|date',
+            'total_amount_decimal_12_2' => 'sometimes|required|numeric|min:0|max:999999999999.99',
+            'payment_method_varchar_255' => 'sometimes|required|string|max:255',
+            'notes_text' => 'nullable|string',
+        ]);
+
+        $sale->update($validated);
         return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
     }
 

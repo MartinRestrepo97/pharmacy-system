@@ -12,7 +12,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        $products = Product::with(['supplier', 'category'])->paginate(10);
         return view('products.index', compact('products'));
     }
 
@@ -29,7 +29,19 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        Product::create($request->all());
+        $validated = $request->validate([
+            'supplier_id' => 'required|exists:suppliers,id',
+            'category_id' => 'required|exists:categories,id',
+            'name_varchar_255' => 'required|string|max:255',
+            'description_text' => 'nullable|string',
+            'purchase_price_decimal_10_2' => 'required|numeric|min:0|max:99999999.99',
+            'sale_price_decimal_10_2' => 'required|numeric|min:0|max:99999999.99',
+            'stock_quantity_int' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date|after:today',
+            'requires_prescription_tinyint' => 'boolean',
+        ]);
+
+        Product::create($validated);
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
@@ -54,7 +66,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product->update($request->all());
+        $validated = $request->validate([
+            'supplier_id' => 'sometimes|required|exists:suppliers,id',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'name_varchar_255' => 'sometimes|required|string|max:255',
+            'description_text' => 'nullable|string',
+            'purchase_price_decimal_10_2' => 'sometimes|required|numeric|min:0|max:99999999.99',
+            'sale_price_decimal_10_2' => 'sometimes|required|numeric|min:0|max:99999999.99',
+            'stock_quantity_int' => 'sometimes|required|integer|min:0',
+            'expiry_date' => 'nullable|date|after:today',
+            'requires_prescription_tinyint' => 'boolean',
+        ]);
+
+        $product->update($validated);
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 
