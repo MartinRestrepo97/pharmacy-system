@@ -12,11 +12,11 @@ class Prescription extends Model
 
     protected $fillable = [
         'product_id',
-        'doctor_name_varchar_255',
-        'doctor_license_varchar_255',
+        'doctor_name',
+        'doctor_license',
         'issue_date',
         'expiry_date',
-        'instructions_text',
+        'instructions',
         'status',
     ];
 

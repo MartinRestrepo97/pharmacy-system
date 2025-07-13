@@ -14,14 +14,14 @@ class Sale extends Model
         'customer_id',
         'user_id',
         'sale_date',
-        'total_amount_decimal_12_2',
-        'payment_method_varchar_255',
-        'notes_text',
+        'total_amount',
+        'payment_method',
+        'notes',
     ];
 
     protected $casts = [
         'sale_date' => 'datetime',
-        'total_amount_decimal_12_2' => 'decimal:2',
+        'total_amount' => 'decimal:2',
     ];
 
     public function customer()

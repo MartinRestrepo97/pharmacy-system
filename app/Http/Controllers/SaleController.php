@@ -12,7 +12,7 @@ class SaleController extends Controller
      */
     public function index()
     {
-        $sales = Sale::all();
+        $sales = Sale::with(['customer', 'user'])->paginate(15);
         return view('sales.index', compact('sales'));
     }
 
@@ -29,7 +29,24 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        Sale::create($request->all());
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:users,id',
+            'sale_date' => 'required|date',
+            'total_amount' => 'required|numeric|min:0',
+            'payment_method' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        Sale::create([
+            'customer_id' => $request->customer_id,
+            'user_id' => $request->user_id,
+            'sale_date' => $request->sale_date,
+            'total_amount' => $request->total_amount,
+            'payment_method' => $request->payment_method,
+            'notes' => $request->notes,
+        ]);
+
         return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
     }
 
@@ -38,6 +55,7 @@ class SaleController extends Controller
      */
     public function show(Sale $sale)
     {
+        $sale->load(['customer', 'user', 'saleItems.product']);
         return view('sales.show', compact('sale'));
     }
 
@@ -54,7 +72,24 @@ class SaleController extends Controller
      */
     public function update(Request $request, Sale $sale)
     {
-        $sale->update($request->all());
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'user_id' => 'required|exists:users,id',
+            'sale_date' => 'required|date',
+            'total_amount' => 'required|numeric|min:0',
+            'payment_method' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        $sale->update([
+            'customer_id' => $request->customer_id,
+            'user_id' => $request->user_id,
+            'sale_date' => $request->sale_date,
+            'total_amount' => $request->total_amount,
+            'payment_method' => $request->payment_method,
+            'notes' => $request->notes,
+        ]);
+
         return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
     }
 

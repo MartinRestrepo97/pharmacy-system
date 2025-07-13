@@ -12,7 +12,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        $products = Product::paginate(15);
         return view('products.index', compact('products'));
     }
 
@@ -29,7 +29,30 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        Product::create($request->all());
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'purchase_price' => 'nullable|numeric|min:0',
+            'sale_price' => 'required|numeric|min:0',
+            'stock_quantity' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date|after:today',
+            'requires_prescription' => 'required|boolean',
+        ]);
+
+        Product::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'supplier_id' => $request->supplier_id,
+            'purchase_price' => $request->purchase_price,
+            'sale_price' => $request->sale_price,
+            'stock_quantity' => $request->stock_quantity,
+            'expiry_date' => $request->expiry_date,
+            'requires_prescription' => $request->requires_prescription,
+        ]);
+
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
@@ -54,7 +77,30 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product->update($request->all());
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'purchase_price' => 'nullable|numeric|min:0',
+            'sale_price' => 'required|numeric|min:0',
+            'stock_quantity' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date|after:today',
+            'requires_prescription' => 'required|boolean',
+        ]);
+
+        $product->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'supplier_id' => $request->supplier_id,
+            'purchase_price' => $request->purchase_price,
+            'sale_price' => $request->sale_price,
+            'stock_quantity' => $request->stock_quantity,
+            'expiry_date' => $request->expiry_date,
+            'requires_prescription' => $request->requires_prescription,
+        ]);
+
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 
