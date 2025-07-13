@@ -10,23 +10,29 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Mass-assignable attributes. These names must exactly match the column
+     * names defined in the `products` table migration; otherwise Eloquent
+     * will throw a MassAssignmentException and the record will not be saved.
+     */
     protected $fillable = [
         'supplier_id',
         'category_id',
-        'name_varchar_255',
-        'description_text',
-        'purchase_price_decimal_10_2',
-        'sale_price_decimal_10_2',
-        'stock_quantity_int',
+        'name',
+        'description',
+        'purchase_price',
+        'sale_price',
+        'stock_quantity',
         'expiry_date',
-        'requires_prescription_tinyint',
+        'requires_prescription',
     ];
 
     protected $casts = [
-        'purchase_price_decimal_10_2' => 'decimal:2',
-        'sale_price_decimal_10_2' => 'decimal:2',
-        'expiry_date' => 'date',
-        'requires_prescription_tinyint' => 'boolean',
+        'purchase_price' => 'decimal:2',
+        'sale_price'      => 'decimal:2',
+        'expiry_date'     => 'date',
+        // `requires_prescription` is stored as a string ("yes"/"no") in the
+        // current schema, so we do not cast it to boolean.
     ];
 
     public function supplier()

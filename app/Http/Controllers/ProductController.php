@@ -12,7 +12,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        // Eager-load relationships and paginate the results to improve
+        // performance when the table starts to grow.
+        $products = Product::with(['category', 'supplier'])->paginate(15);
         return view('products.index', compact('products'));
     }
 
